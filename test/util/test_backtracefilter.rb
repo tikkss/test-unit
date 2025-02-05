@@ -5,6 +5,21 @@ require 'test/unit/util/backtracefilter'
 module Test::Unit::Util
   class TestBacktraceFilter < Test::Unit::TestCase
     include BacktraceFilter
+
+    class << self
+      def parallel_safe?
+        false
+      end
+    end
+
+    def setup
+      @previous_test_unit_all_backtrace = ENV["TEST_UNIT_ALL_BACKTRACE"].dup
+      ENV.delete("TEST_UNIT_ALL_BACKTRACE")
+    end
+
+    def teardown
+      ENV["TEST_UNIT_ALL_BACKTRACE"] = @previous_test_unit_all_backtrace
+    end
     
     def test_filter_backtrace
       backtrace = [%q{C:\some\old\path/test/unit/assertions.rb:44:in 'assert'},

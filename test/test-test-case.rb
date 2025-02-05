@@ -9,6 +9,12 @@ require 'test/unit'
 module Test
   module Unit
     class TestTestCase < TestCase
+      class << self
+        def parallel_safe?
+          false
+        end
+      end
+
       self.test_order = :random
       def test_creation
         test_case = Class.new(TestCase) do
@@ -26,6 +32,9 @@ module Test
       end
 
       def setup
+        @previous_test_unit_all_backtrace = ENV["TEST_UNIT_ALL_BACKTRACE"].dup
+        ENV.delete("TEST_UNIT_ALL_BACKTRACE")
+
         @tc_failure_error = Class.new(TestCase) do
           def test_failure
             assert_block("failure") do
@@ -51,6 +60,10 @@ module Test
         def @tc_failure_error.name
           "TC_FailureError"
         end
+      end
+
+      def teardown
+        ENV["TEST_UNIT_ALL_BACKTRACE"] = @previous_test_unit_all_backtrace
       end
 
       def jruby_backtrace_entry?(entry)

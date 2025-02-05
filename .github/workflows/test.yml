@@ -140,3 +140,4 @@ jobs:
         env:
           RUBYOPT: ${{ matrix.rubyopt }}
           TESTOPTS: ${{ matrix.testopts }}
+          TEST_UNIT_ALL_BACKTRACE: 1
