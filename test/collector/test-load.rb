@@ -436,7 +436,6 @@ EOT
 
   private
   def assert_collect(expected, *collect_args)
-    pp collect_args
     keep_required_files do
       Dir.chdir(@test_dir.to_s) do
         collector = Test::Unit::Collector::Load.new
