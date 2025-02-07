@@ -345,6 +345,7 @@ EOT
   end
 
   def test_collect_file
+    pp @test_case1.to_s
     assert_collect([:suite, {:name => _test_case_name("TestCase1")},
                     [:test, {:name => "test1_1"}],
                     [:test, {:name => "test1_2"}]],
