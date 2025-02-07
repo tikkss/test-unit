@@ -49,6 +49,7 @@ module Test
 
       def sort(suites)
         suites.sort_by do |suite|
+          pp ["#" * (Thread.current.object_id % 10), suite.priority, suite.name || suite.to_s]
           [suite.priority, suite.name || suite.to_s]
         end
       end
@@ -59,13 +60,11 @@ module Test
         return if children.nil?
 
         sub_suites = []
-        puts "child: #{children.inspect}"
         children.each do |child|
           sub_suite = child.suite
           add_test_case(sub_suite, child, children_map)
           add_suite(sub_suites, sub_suite)
         end
-        puts "sub_suites: #{sub_suites.inspect}"
         sort(sub_suites).each do |sub_suite|
           suite << sub_suite
         end
