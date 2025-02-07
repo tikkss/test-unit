@@ -151,7 +151,6 @@ module Test
         end
 
         def inherited(sub_class) # :nodoc:
-          pp "inherited '#{sub_class}'"
           DESCENDANTS << sub_class
           super
         end

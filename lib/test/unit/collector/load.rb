@@ -115,7 +115,6 @@ module Test
           return if @program_file == expanded_path.to_s
           add_load_path(expanded_path.dirname) do
             begin
-              pp "require '#{expanded_path}'"
               require(expanded_path.to_s)
             rescue LoadError
               @require_failed_infos << {:path => expanded_path, :exception => $!}
