@@ -48,8 +48,10 @@ module Test
       end
 
       def sort(suites)
-        suites.sort_by do |suite|
+        suites.each do |suite|
           pp ["#" * (Thread.current.object_id % 10), suite.priority, suite.name || suite.to_s]
+        end
+        suites.sort_by do |suite|
           [suite.priority, suite.name || suite.to_s]
         end
       end
