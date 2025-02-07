@@ -32,8 +32,10 @@ module Test
           children_map[parent] ||= []
           children_map[parent] << test_case
         end
+        pp "children map: #{children_map}"
 
         root_test_cases = children_map.keys - test_cases
+        pp "root_test_cases: #{root_test_cases}"
         root_test_cases.each do |root_test_case|
           add_test_case(suite, root_test_case, children_map)
         end
@@ -56,13 +58,17 @@ module Test
       private
       def add_test_case(suite, test_case, children_map)
         children = children_map[test_case]
+        puts "children: #{children.inspect}"
         return if children.nil?
 
         sub_suites = []
         children.each do |child|
           sub_suite = child.suite
           add_test_case(sub_suite, child, children_map)
+          puts "sub_suite: #{sub_suite.inspect}"
+          puts "before sub_suites: #{sub_suites.inspect}"
           add_suite(sub_suites, sub_suite)
+          puts "after sub_suites: #{sub_suites.inspect}"
         end
         sort(sub_suites).each do |sub_suite|
           suite << sub_suite

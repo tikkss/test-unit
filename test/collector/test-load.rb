@@ -345,7 +345,6 @@ EOT
   end
 
   def test_collect_file
-    pp @test_case1.to_s
     assert_collect([:suite, {:name => _test_case_name("TestCase1")},
                     [:test, {:name => "test1_1"}],
                     [:test, {:name => "test1_2"}]],
@@ -437,6 +436,7 @@ EOT
 
   private
   def assert_collect(expected, *collect_args)
+    pp collect_args
     keep_required_files do
       Dir.chdir(@test_dir.to_s) do
         collector = Test::Unit::Collector::Load.new

@@ -47,6 +47,7 @@ module Test
                 test_suite = collect_recursive(from, already_gathered)
                 test_suites << test_suite unless test_suite.tests.empty?
               else
+                pp already_gathered
                 collect_file(from, test_suites, already_gathered)
               end
             end
@@ -115,6 +116,7 @@ module Test
           return if @program_file == expanded_path.to_s
           add_load_path(expanded_path.dirname) do
             begin
+              pp "require '#{expanded_path}'"
               require(expanded_path.to_s)
             rescue LoadError
               @require_failed_infos << {:path => expanded_path, :exception => $!}
