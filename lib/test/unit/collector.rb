@@ -66,7 +66,7 @@ module Test
         end
         pp "#{children} sub_suites:"
         sub_suites.each do |suite|
-          pp ["#" * (Thread.current.object_id % 10), suite.priority, suite.name || suite.to_s]
+          pp ["#" * (Thread.current.object_id % 10), suite.priority, suite.name, suite.to_s, suite.name || suite.to_s]
         end
         sort(sub_suites).each do |sub_suite|
           suite << sub_suite
