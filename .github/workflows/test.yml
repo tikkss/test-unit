@@ -8,6 +8,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - name: "3.3 + Thread"
+            ruby-version: "3.3"
+            runs-on: "ubuntu-latest"
+            testopts: "--parallel=thread"
+          - name: "3.3 on macOS + Thread"
+            ruby-version: "3.3"
+            runs-on: "macos-latest"
+            testopts: "--parallel=thread"
           - name: "3.3 on Windows"
             ruby-version: "3.3"
             runs-on: "windows-latest"
