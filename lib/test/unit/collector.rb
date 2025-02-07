@@ -64,6 +64,7 @@ module Test
           add_test_case(sub_suite, child, children_map)
           add_suite(sub_suites, sub_suite)
         end
+        pp "#{children} sub_suites:"
         sub_suites.each do |suite|
           pp ["#" * (Thread.current.object_id % 10), suite.priority, suite.name || suite.to_s]
         end
