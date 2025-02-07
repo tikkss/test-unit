@@ -49,6 +49,9 @@ module Test
 
       def sort(suites)
         suites.sort_by do |suite|
+          puts "suite: #{suite.inspect}"
+          puts "suite name: #{suite.name.inspect}"
+          puts "suite to_s: #{suite.to_s.inspect}"
           [suite.priority, suite.name || suite.to_s]
         end
       end
@@ -59,13 +62,13 @@ module Test
         return if children.nil?
 
         sub_suites = []
-        pp children
+        puts "child: #{children.inspect}"
         children.each do |child|
           sub_suite = child.suite
           add_test_case(sub_suite, child, children_map)
           add_suite(sub_suites, sub_suite)
         end
-        pp sub_suites
+        puts "sub_suites: #{sub_suites.inspect}"
         sort(sub_suites).each do |sub_suite|
           suite << sub_suite
         end
