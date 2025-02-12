@@ -49,6 +49,7 @@ module Test
 
       def sort(suites)
         suites.sort_by do |suite|
+          p suite.class
           [suite.priority, suite.name || suite.to_s]
         end
       end
