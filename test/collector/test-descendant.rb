@@ -162,8 +162,7 @@ class TestUnitCollectorDescendant < Test::Unit::TestCase
         def test_no_ractor_1_1
         end
 
-        ractor
-        def test_ractor_1_1
+        ractor def test_ractor_1_1
         end
 
         def test_no_ractor_1_2
