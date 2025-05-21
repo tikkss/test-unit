@@ -40,7 +40,7 @@ module Test
           start_time = Time.now
           begin
             with_listener(result) do
-              @test_suite_runner_class.run_all_tests do |run_context|
+              @test_suite_runner_class.run_all_tests(@options) do |run_context|
                 catch do |stop_tag|
                   result.stop_tag = stop_tag
                   notify_listeners(RESET, @suite.size)

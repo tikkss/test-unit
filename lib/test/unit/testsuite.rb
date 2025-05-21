@@ -40,6 +40,18 @@ module Test
         @elapsed_time = nil
       end
 
+      def find(name)
+        @tests.each do |test|
+          if test.is_a?(self.class)
+            t = test.find(name)
+            return t if t
+          else
+            return test if test.name == name
+          end
+        end
+        nil
+      end
+
       def parallel_safe?
         return true if @test_case.nil?
         @test_case.parallel_safe?
