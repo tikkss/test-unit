@@ -42,7 +42,7 @@ module Test
           end
         end
 
-        def run_all_tests(options)
+        def run_all_tests(result, options)
           n_workers = TestSuiteRunner.n_workers
 
           workers = []
@@ -67,10 +67,11 @@ module Test
               workers << Worker.new(pid, main_to_worker_output, worker_to_main_input)
             end
 
-            yield(TestProcessRunContext.new(self))
+            run_context = TestProcessRunContext.new(self)
+            yield(run_context)
 
             worker_inputs = workers.collect(&:worker_to_main_input)
-            until tasks.empty? do
+            until run_context.tasks.empty? do
               readables, = IO.select(worker_inputs)
               readables.each do |worker_to_main_input|
                 worker_id = worker_inputs.index(worker_to_main_input)
@@ -78,9 +79,13 @@ module Test
                 data = worker.receive
                 case data[:status]
                 when :ready
-                  task = tasks.pop
+                  task = run_context.tasks.pop
                   break if task.nil?
                   worker.send(task)
+                when :result
+                  action = data[:action]
+                  args = data[:args]
+                  result.__send__(action, *args)
                 end
               end
             end
@@ -99,15 +104,9 @@ module Test
       def run_tests(result, run_context: nil, &progress_block)
         @test_suite.tests.each do |test|
           if test.is_a?(TestSuite) or not @test_suite.parallel_safe?
-            run_test(test, result, &progress_block)
+            run_test(test, result, run_context: run_context, &progress_block)
           else
-            # なんとかせんといかん
-            task = lambda do |stop_tag|
-              sub_result = SubTestResult.new(result)
-              sub_result.stop_tag = stop_tag
-              run_test(test, sub_result, &progress_block)
-            end
-            run_context.tasks << test_name
+            run_context.tasks << test.name
           end
         end
       end

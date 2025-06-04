@@ -6,6 +6,7 @@ require_relative "priority"
 require_relative "attribute-matcher"
 require_relative "testcase"
 require_relative "test-suite-thread-runner"
+require_relative "test-suite-process-runner"
 require_relative "version"
 
 module Test
@@ -415,6 +416,7 @@ module Test
 
           parallel_options = [
             :thread,
+            :process,
           ]
           o.on("--[no-]parallel=[thread]", parallel_options,
                "Runs tests in parallel",
@@ -422,6 +424,8 @@ module Test
             case parallel
             when nil, :thread
               @test_suite_runner_class = TestSuiteThreadRunner
+            when :process
+              @test_suite_runner_class = TestSuiteProcessRunner
             else
               @test_suite_runner_class = TestSuiteRunner
             end

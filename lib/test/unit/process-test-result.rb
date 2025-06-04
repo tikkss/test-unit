@@ -11,45 +11,44 @@ module Test
         @output = output
       end
 
-      def add_run(result=self)
-        @parent_test_result.add_run(result)
+      def add_run
+        send_result(__method__)
       end
 
       def add_pass
-        @parent_test_result.add_pass
+        send_result(__method__)
       end
 
       # Records an individual assertion.
       def add_assertion
-        @parent_test_result.add_assertion
+        send_result(__method__)
       end
 
       def add_error(error)
-        @parent_test_result.add_error(error)
+        send_result(__method__, error)
       end
 
       def add_failure(failure)
-        @parent_test_result.add_failure(failure)
+        send_result(__method__, failure)
       end
 
       def add_pending(pending)
-        @parent_test_result.add_pending(pending)
+        send_result(__method__, pending)
       end
 
       def add_omission(omission)
-        @parent_test_result.add_omission(omission)
+        send_result(__method__, omission)
       end
 
       def add_notification(notification)
-        @parent_test_result.add_notification(notification)
+        send_result(__method__, notification)
       end
 
-      def passed?
-        @parent_test_result.passed?
-      end
+      private
 
-      def stop
-        throw @stop_tag
+      def send_result(action, *args)
+        Marshal.dump({status: :result, action: action, args: args}, @output)
+        @output.flush
       end
     end
   end
