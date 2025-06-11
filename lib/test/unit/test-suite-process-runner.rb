@@ -86,6 +86,10 @@ module Test
                   action = data[:action]
                   args = data[:args]
                   result.__send__(action, *args)
+                when :event
+                  event_name = data[:event_name]
+                  args = data[:args]
+                  options[:event_listener].call(event_name, *args)
                 end
               end
             end

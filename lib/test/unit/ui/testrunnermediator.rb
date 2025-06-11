@@ -40,6 +40,10 @@ module Test
           start_time = Time.now
           begin
             with_listener(result) do
+              event_listener = lambda do |channel, value|
+                notify_listeners(channel, value)
+              end
+              @options[:event_listener] = event_listener
               @test_suite_runner_class.run_all_tests(result, @options) do |run_context|
                 catch do |stop_tag|
                   result.stop_tag = stop_tag
@@ -69,9 +73,7 @@ module Test
           if result.nil?
             run
           else
-            @suite.run(result, run_context: run_context) do |channel, value|
-              notify_listeners(channel, value)
-            end
+            @suite.run(result, run_context: run_context, &@options[:event_listener])
           end
         end
 

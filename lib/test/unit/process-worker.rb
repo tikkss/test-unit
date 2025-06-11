@@ -29,7 +29,11 @@ loop do
   # suite の中から対象のテストを実行して結果を返す
   test = suite.find(task)
   result = Test::Unit::ProcessTestResult.new(data_output)
-  test.run(result)
+  test.run(result) do |event_name, *args|
+    pp [event_name, args]
+    Marshal.dump({status: :event, event_name: event_name, args: args}, data_output)
+    data_output.flush
+  end
 end
 
 data_input.close
