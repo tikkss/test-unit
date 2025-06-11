@@ -12,6 +12,7 @@ test_paths = parser.parse!
 
 require_relative "../unit"
 require_relative "collector/load"
+require_relative "process-test-result"
 Test::Unit::AutoRunner.need_auto_run = false
 collector = Test::Unit::Collector::Load.new
 collector.base = base_directory
