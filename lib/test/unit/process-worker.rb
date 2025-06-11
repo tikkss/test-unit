@@ -27,8 +27,6 @@ loop do
   task = Marshal.load(data_input)
   break if task.nil?
   # suite の中から対象のテストを実行して結果を返す
-  pp suite.methods.sort
-  pp suite.method(:initialize).source_location
   test = suite.find(task)
   result = Test::Unit::ProcessTestResult.new(data_output)
   test.run(result)
