@@ -30,7 +30,13 @@ loop do
   test = suite.find(task)
   result = Test::Unit::ProcessTestResult.new(data_output)
   test.run(result) do |event_name, *args|
-    pp [event_name, args]
+    args = args.collect do |arg|
+      if arg.respond_to?(:to_marshalable)
+        arg.to_marshalable
+      else
+        arg
+      end
+    end
     Marshal.dump({status: :event, event_name: event_name, args: args}, data_output)
     data_output.flush
   end

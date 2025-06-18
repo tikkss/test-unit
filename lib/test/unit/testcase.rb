@@ -887,6 +887,12 @@ module Test
         current_result.add_pass
       end
 
+      def to_marshalable
+        marshalable = self.class.new(@method_name)
+        marshalable.instance_variable_set(:@internal_data, @internal_data.to_marshalable)
+        marshalable
+      end
+
       private
       def current_result
         @_result
@@ -943,6 +949,16 @@ module Test
           @test_data_label = nil
           @test_data = nil
           @run_context = nil
+        end
+
+        def to_marshalable
+          marshalable = self.class.new
+          marshalable.instance_variable_set(:@start_time, @start_time)
+          marshalable.instance_variable_set(:@elapsed_time, @elapsed_time)
+          marshalable.instance_variable_set(:@passed, @passed)
+          marshalable.instance_variable_set(:@interrupted, @interrupted)
+          marshalable.instance_variable_set(:@test_data_label, @test_data_label)
+          marshalable
         end
 
         def passed?
