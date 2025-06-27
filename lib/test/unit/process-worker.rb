@@ -29,7 +29,8 @@ loop do
   # suite の中から対象のテストを実行して結果を返す
   test = suite.find(task)
   result = Test::Unit::ProcessTestResult.new(data_output)
-  test.run(result) do |event_name, *args|
+  run_context = Test::Unit::TestRunContext.new(Test::Unit::TestSuiteRunner)
+  test.run(result, run_context: run_context) do |event_name, *args|
     args = args.collect do |arg|
       if arg.respond_to?(:to_marshalable)
         arg.to_marshalable
