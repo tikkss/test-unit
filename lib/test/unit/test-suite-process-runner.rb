@@ -96,6 +96,27 @@ module Test
             workers.each do |worker|
               worker.send(nil)
             end
+            until worker_inputs.empty? do
+              readables, = IO.select(worker_inputs)
+              readables.each do |worker_to_main_input|
+                worker = workers.find do |w|
+                  w.worker_to_main_input == worker_to_main_input
+                end
+                data = worker.receive
+                case data[:status]
+                when :result
+                  action = data[:action]
+                  args = data[:args]
+                  result.__send__(action, *args)
+                when :event
+                  event_name = data[:event_name]
+                  args = data[:args]
+                  options[:event_listener].call(event_name, *args)
+                when :done
+                  worker_inputs.delete(worker_to_main_input)
+                end
+              end
+            end
           ensure
             workers.each do |worker|
               worker.wait

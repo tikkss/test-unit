@@ -42,6 +42,8 @@ loop do
     data_output.flush
   end
 end
+Marshal.dump({status: :done}, data_output)
+data_output.flush
 
 data_input.close
 data_output.close
