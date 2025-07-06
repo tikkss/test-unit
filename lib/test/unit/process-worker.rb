@@ -45,5 +45,7 @@ end
 Marshal.dump({status: :done}, data_output)
 data_output.flush
 
+Marshal.load(data_input)
+
 data_input.close
 data_output.close

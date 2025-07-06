@@ -114,6 +114,7 @@ module Test
                   options[:event_listener].call(event_name, *args)
                 when :done
                   worker_inputs.delete(worker_to_main_input)
+                  worker.send(nil)
                 end
               end
             end
