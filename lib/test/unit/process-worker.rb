@@ -30,7 +30,8 @@ loop do
   test = suite.find(task)
   result = Test::Unit::ProcessTestResult.new(data_output)
   run_context = Test::Unit::TestRunContext.new(Test::Unit::TestSuiteRunner)
-  test.run(result, run_context: run_context) do |event_name, *args|
+
+  event_listener = lambda do |event_name, *args|
     args = args.collect do |arg|
       if arg.respond_to?(:to_marshalable)
         arg.to_marshalable
@@ -40,6 +41,13 @@ loop do
     end
     Marshal.dump({status: :event, event_name: event_name, args: args}, data_output)
     data_output.flush
+  end
+  if test.method(:run).arity == -2
+    test.run(result, run_context: run_context, &event_listener)
+  else
+    # For backward compatibility. There are scripts that overrides
+    # Test::Unit::TestCase#run without keyword arguments.
+    test.run(result, &event_listener)
   end
 end
 Marshal.dump({status: :done}, data_output)
