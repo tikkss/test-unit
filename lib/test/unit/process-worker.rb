@@ -42,6 +42,9 @@ loop do
     Marshal.dump({status: :event, event_name: event_name, args: args}, data_output)
     data_output.flush
   end
+
+  test_case = test.class
+  test_case.startup
   if test.method(:run).arity == -2
     test.run(result, run_context: run_context, &event_listener)
   else
@@ -49,6 +52,7 @@ loop do
     # Test::Unit::TestCase#run without keyword arguments.
     test.run(result, &event_listener)
   end
+  test_case.shutdown
 end
 Marshal.dump({status: :done}, data_output)
 data_output.flush
