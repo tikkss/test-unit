@@ -165,3 +165,36 @@ jobs:
         env:
           RUBYOPT: ${{ matrix.rubyopt }}
           TESTOPTS: ${{ matrix.testopts }}
+
+  rbs-windows:
+    name: RBS on Windows
+    runs-on: windows-2025
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: test-unit
+      - uses: actions/checkout@v6
+        with:
+          repository: ruby/rbs
+          path: rbs
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: mswin
+      - name: Use test-unit
+        working-directory: rbs
+        shell: bash
+        run: |
+          ruby \
+            -i.bak \
+            -pe '$_.gsub!(/(gem "test-unit")/, "\\1, path: \"#{Dir.pwd}/../test-unit/\"")' \
+            Gemfile
+      - name: Install dependencies
+        working-directory: rbs
+        run: |
+          bundle config without "libs"
+          bundle install
+      - name: Test
+        working-directory: rbs
+        run: |
+          bundle exec rake
