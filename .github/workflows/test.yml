@@ -192,8 +192,7 @@ jobs:
       - name: Install dependencies
         working-directory: rbs
         run: |
-          bundle config without "libs"
-          bundle install
+          bin/setup
       - name: Test
         working-directory: rbs
         run: |
