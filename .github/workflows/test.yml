@@ -176,7 +176,6 @@ jobs:
       - uses: actions/checkout@v6
         with:
           path: test-unit
-          ref: 691a96e0656560d6ff003fd3747b4bd8ad95a54f
       - uses: actions/checkout@v6
         with:
           repository: ruby/rbs
