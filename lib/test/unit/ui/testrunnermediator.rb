@@ -57,6 +57,8 @@ module Test
               end
             end
           ensure
+            @options.delete(:event_listener)
+            @options.delete(:test_suite)
             elapsed_time = Time.now - start_time
             notify_listeners(FINISHED, elapsed_time)
           end
