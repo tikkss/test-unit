@@ -45,7 +45,6 @@ module Test
                 notify_listeners(channel, value)
               end
               @options[:event_listener] = event_listener
-              @options[:test_suite] = @suite
               @test_suite_runner_class.run_all_tests(result, @options) do |run_context|
                 catch do |stop_tag|
                   result.stop_tag = stop_tag
