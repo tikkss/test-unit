@@ -78,6 +78,7 @@ module Test
                   # child processes.
                   pid = spawn(*command_line)
                   data_socket = tcp_server.accept
+                  data_socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, true)
                   workers << Worker.new(pid, data_socket, data_socket)
                 else
                   main_to_worker_input, main_to_worker_output = IO.pipe

@@ -41,6 +41,7 @@ suite = collector.collect(*test_paths)
 io_open = lambda do |&block|
   if Gem.win_platform?
     TCPSocket.open(remote_ip_address, remote_ip_port) do |data_socket|
+      data_socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, true)
       block.call(data_socket, data_socket)
     end
   else
