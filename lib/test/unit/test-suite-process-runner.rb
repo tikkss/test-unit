@@ -93,14 +93,16 @@ module Test
                   workers << Worker.new(pid, main_to_worker_output, worker_to_main_input)
                 end
               end
+              p ["%f" % (Time.now - start_time), :spawned]
               if Gem.win_platform?
                 workers = workers.collect do
                   data_socket = tcp_server.accept
+                  p ["%f" % (Time.now - start_time), :accepted]
                   pid = Marshal.load(data_socket)
+                  p ["%f" % (Time.now - start_time), :loaded_pid]
                   Worker.new(pid, data_socket, data_socket)
                 end
               end
-              p ["%f" % (Time.now - start_time), :accepted]
 
               run_context = TestProcessRunContext.new(self)
               yield(run_context)
