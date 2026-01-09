@@ -106,7 +106,10 @@ module Test
         collector.base = auto_runner.base
         collector.default_test_paths = auto_runner.default_test_paths
         collector.filter = auto_runner.filters
-        collector.collect(*auto_runner.to_run)
+        start_time = Time.now
+        result = collector.collect(*auto_runner.to_run)
+        p ["%f" % (Time.now - start_time), :collected_main_process]
+        result
       end
 
       # JUST TEST!
