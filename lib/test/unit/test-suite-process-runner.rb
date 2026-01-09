@@ -93,7 +93,6 @@ module Test
               if Gem.win_platform?
                 workers = workers.collect do
                   data_socket = tcp_server.accept
-                  data_socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, true)
                   pid = Marshal.load(data_socket)
                   Worker.new(pid, data_socket, data_socket)
                 end
