@@ -52,7 +52,9 @@ module Test
           n_workers = TestSuiteRunner.n_workers
           test_suite = options[:test_suite]
 
+          start_time = Time.now
           start_tcp_server do |tcp_server|
+            p ["%f" % (Time.now - start_time), :started_tcp_server]
             workers = []
             begin
               n_workers.times do |i|
@@ -97,11 +99,13 @@ module Test
                   Worker.new(pid, data_socket, data_socket)
                 end
               end
+              p ["%f" % (Time.now - start_time), :accepted]
 
               run_context = TestProcessRunContext.new(self)
               yield(run_context)
               run_context.progress_block.call(TestSuite::STARTED, test_suite.name)
               run_context.progress_block.call(TestSuite::STARTED_OBJECT, test_suite)
+              p ["%f" % (Time.now - start_time), :enqueued]
 
               worker_inputs = workers.collect(&:worker_to_main_input)
               until run_context.test_names.empty? do
@@ -118,9 +122,11 @@ module Test
                   end
                 end
               end
+              p ["%f" % (Time.now - start_time), :dequeued]
               workers.each do |worker|
                 worker.send(nil)
               end
+              p ["%f" % (Time.now - start_time), :sent_finish]
               until worker_inputs.empty? do
                 select_each_worker(worker_inputs, workers) do |worker_to_main_input, worker, data|
                   case data[:status]
@@ -134,14 +140,17 @@ module Test
                   end
                 end
               end
+              p ["%f" % (Time.now - start_time), :done]
             ensure
               workers.each do |worker|
                 worker.wait
               end
+              p ["%f" % (Time.now - start_time), :waited]
             end
 
             run_context.progress_block.call(TestSuite::FINISHED, test_suite.name)
             run_context.progress_block.call(TestSuite::FINISHED_OBJECT, test_suite)
+            p ["%f" % (Time.now - start_time), :finished]
           end
         end
 
