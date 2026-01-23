@@ -53,7 +53,6 @@ module Test
           test_suite = options[:test_suite]
 
           start_time = Time.now
-          spawn(Gem.ruby, File.join(__dir__, "nothing.rb"), start_time.to_s)
           start_tcp_server do |tcp_server|
             p ["%f" % (Time.now - start_time), :started_tcp_server]
             workers = []
