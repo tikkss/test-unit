@@ -35,19 +35,12 @@ test_paths = parser.parse!
 p ["%2s: " % worker_id, "%f" % (Time.now - start_time), :spawned_a_process]
 
 require_relative "../unit"
-p ["%2s: " % worker_id, "%f" % (Time.now - start_time), 1]
 require_relative "collector/load"
-p ["%2s: " % worker_id, "%f" % (Time.now - start_time), 2]
 require_relative "process-test-result"
-p ["%2s: " % worker_id, "%f" % (Time.now - start_time), 3]
 require_relative "worker-context"
-p ["%2s: " % worker_id, "%f" % (Time.now - start_time), 4]
 Test::Unit::AutoRunner.need_auto_run = false
-p ["%2s: " % worker_id, "%f" % (Time.now - start_time), 5]
 collector = Test::Unit::Collector::Load.new
-p ["%2s: " % worker_id, "%f" % (Time.now - start_time), 6]
 collector.base = base_directory
-p ["%2s: " % worker_id, "%f" % (Time.now - start_time), 7]
 suite = collector.collect(*test_paths)
 p ["%2s: " % worker_id, "%f" % (Time.now - start_time), :collected_suite]
 
