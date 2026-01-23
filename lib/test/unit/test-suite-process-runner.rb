@@ -75,7 +75,6 @@ module Test
                   command_line << "--ip-address" << local_address.ip_address
                   command_line << "--ip-port" << local_address.ip_port.to_s
                 end
-                command_line << "--start-time" << start_time.to_s
                 command_line.concat(test_paths)
                 if Gem.win_platform?
                   # On Windows, file descriptors 3 and above cannot be passed to

@@ -27,12 +27,7 @@ remote_ip_port = nil
 parser.on("--ip-port=PORT", Integer) do |port|
   remote_ip_port = port
 end
-start_time = nil
-parser.on("--start-time=TIME") do |time|
-  start_time = Time.new(time)
-end
 test_paths = parser.parse!
-p ["%2s: " % worker_id, "%f" % (Time.now - start_time), :spawned_a_process]
 
 require_relative "../unit"
 require_relative "collector/load"
@@ -42,16 +37,12 @@ Test::Unit::AutoRunner.need_auto_run = false
 collector = Test::Unit::Collector::Load.new
 collector.base = base_directory
 suite = collector.collect(*test_paths)
-p ["%2s: " % worker_id, "%f" % (Time.now - start_time), :collected_suite]
 
 io_open = lambda do |&block|
   if Gem.win_platform?
     TCPSocket.open(remote_ip_address, remote_ip_port) do |data_socket|
-      p ["%2s: " % worker_id, "%f" % (Time.now - start_time), :opened_socket]
       Marshal.dump(Process.pid, data_socket)
-      p ["%2s: " % worker_id, "%f" % (Time.now - start_time), :dumped_pid]
       data_socket.flush
-      p ["%2s: " % worker_id, "%f" % (Time.now - start_time), :flushed]
       block.call(data_socket, data_socket)
     end
   else
