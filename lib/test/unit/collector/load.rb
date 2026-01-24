@@ -46,11 +46,14 @@ module Test
             p [Process.pid, "%f" % (Time.now - start_time), :found_test_cases]
             froms.each do |from|
               from = resolve_path(from)
+              p [Process.pid, "%f" % (Time.now - start_time), :resolved_path, from]
               if from.directory?
                 test_suite = collect_recursive(from, already_gathered)
+                p [Process.pid, "%f" % (Time.now - start_time), :collected_recursive, from]
                 test_suites << test_suite unless test_suite.tests.empty?
               else
                 collect_file(from, test_suites, already_gathered)
+                p [Process.pid, "%f" % (Time.now - start_time), :collected_file, from]
               end
             end
             p [Process.pid, "%f" % (Time.now - start_time), :collected_file]
