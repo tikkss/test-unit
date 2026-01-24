@@ -89,6 +89,7 @@ module Test
 
         private
         def collect_recursive(path, already_gathered)
+          start_time = Time.now
           sub_test_suites = []
 
           if path.directory?
@@ -99,16 +100,19 @@ module Test
             files.each do |child|
               next if excluded_file?(child.basename.to_s)
               collect_file(child, sub_test_suites, already_gathered)
+              p [Process.pid, "%f" % (Time.now - start_time), :collected_file, child]
             end
 
             directories.each do |child|
               next if excluded_directory?(child.basename.to_s)
               sub_test_suite = collect_recursive(child, already_gathered)
               sub_test_suites << sub_test_suite unless sub_test_suite.empty?
+              p [Process.pid, "%f" % (Time.now - start_time), :collected_recursive, child]
             end
           else
             unless excluded_file?(path.basename.to_s)
               collect_file(path, sub_test_suites, already_gathered)
+              p [Process.pid, "%f" % (Time.now - start_time), :collected_file, path]
             end
           end
 
@@ -116,6 +120,7 @@ module Test
           sort(sub_test_suites).each do |sub_test_suite|
             test_suite << sub_test_suite
           end
+          p [Process.pid, "%f" % (Time.now - start_time), :sorted]
           test_suite
         end
 
