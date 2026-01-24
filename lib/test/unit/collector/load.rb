@@ -35,12 +35,15 @@ module Test
         end
 
         def collect(*froms)
+          start_time = Time.now
           add_load_path(@base) do
+            p [Process.pid, "%f" % (Time.now - start_time), :added_load_path]
             froms = @default_test_paths if froms.empty?
             froms = ["."] if froms.empty?
             test_suites = []
             already_gathered = {}
             find_test_cases(already_gathered)
+            p [Process.pid, "%f" % (Time.now - start_time), :found_test_cases]
             froms.each do |from|
               from = resolve_path(from)
               if from.directory?
@@ -50,7 +53,9 @@ module Test
                 collect_file(from, test_suites, already_gathered)
               end
             end
+            p [Process.pid, "%f" % (Time.now - start_time), :collected_file]
             add_require_failed_test_suite(test_suites)
+            p [Process.pid, "%f" % (Time.now - start_time), :added_require_failed_test_suite]
 
             if test_suites.size > 1
               test_suite = TestSuite.new("[#{froms.join(', ')}]")
@@ -60,8 +65,10 @@ module Test
             else
               test_suite = test_suites.first
             end
+            p [Process.pid, "%f" % (Time.now - start_time), :sorted]
 
             adjust_ractor_tests(test_suite)
+            p [Process.pid, "%f" % (Time.now - start_time), :adjusted_ractor_tests]
 
             test_suite
           end
