@@ -50,6 +50,12 @@ class TestFaultLocationDetector < Test::Unit::TestCase
   end
 
   class TestSourceLocation < self
+    class << self
+      def parallel_safe?
+        false
+      end
+    end
+
     setup
     def setup_check_source_location(&_)
       unless lambda {}.respond_to?(:source_location)
@@ -72,6 +78,12 @@ class TestFaultLocationDetector < Test::Unit::TestCase
     end
 
     class TestOneLine < self
+      class << self
+        def parallel_safe?
+          false
+        end
+      end
+
       def test_brace
         target_line_number = nil
         test_case = Class.new(Test::Unit::TestCase) do
@@ -113,11 +125,19 @@ class TestFaultLocationDetector < Test::Unit::TestCase
 
         class << self
           def target_line_number
-            @target_line_number
+            if defined?(Ractor) and not(Ractor.main?)
+              Ractor["#{name}_target_line_number"]
+            else
+              @target_line_number
+            end
           end
 
           def target_line_number=(line_number)
-            @target_line_number = line_number
+            if defined?(Ractor) and not(Ractor.main?)
+              Ractor["#{name}_target_line_number"] = line_number
+            else
+              @target_line_number = line_number
+            end
           end
         end
 
@@ -135,11 +155,19 @@ class TestFaultLocationDetector < Test::Unit::TestCase
 
       class << self
         def target_line_number
-          @target_line_number
+          if defined?(Ractor) and not(Ractor.main?)
+            Ractor["#{name}_target_line_number"]
+          else
+            @target_line_number
+          end
         end
 
         def target_line_number=(line_number)
-          @target_line_number = line_number
+          if defined?(Ractor) and not(Ractor.main?)
+            Ractor["#{name}_target_line_number"] = line_number
+          else
+            @target_line_number = line_number
+          end
         end
       end
     end

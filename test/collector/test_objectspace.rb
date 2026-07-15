@@ -16,6 +16,7 @@ module Test
         end
 
         def setup
+          omit if runner_class == Test::Unit::TestSuiteRactorRunner
           @tc1 = Class.new(TestCase) do
             self.test_order = :alphabetic
             def self.name

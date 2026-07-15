@@ -12,6 +12,7 @@ class TestUnitCollectorLoad < Test::Unit::TestCase
   end
 
   def setup
+    omit if defined?(Ractor) and not(Ractor.main?)
     @previous_descendants = Test::Unit::TestCase::DESCENDANTS.dup
     Test::Unit::TestCase::DESCENDANTS.clear
 
@@ -287,6 +288,7 @@ EOT
   end
 
   def teardown
+    return if defined?(Ractor) and not(Ractor.main?)
     @test_dir.rmtree if @test_dir.exist?
     ::Object.send(:remove_const, @temporary_test_cases_module_name)
     Test::Unit::TestCase::DESCENDANTS.replace(@previous_descendants)

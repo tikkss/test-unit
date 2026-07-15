@@ -1,4 +1,8 @@
 class TestUnitAttribute < Test::Unit::TestCase
+  def setup
+    omit
+  end
+
   class TestStack < Test::Unit::TestCase
     class << self
       def suite

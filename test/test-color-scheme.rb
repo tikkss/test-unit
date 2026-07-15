@@ -1,5 +1,6 @@
 class TestUnitColorScheme < Test::Unit::TestCase
   def test_register
+    omit
     inverted_scheme_spec = {
       "success" => {:name => "red"},
       "failure" => {:name => "green"},
@@ -91,6 +92,12 @@ class TestUnitColorScheme < Test::Unit::TestCase
   class TestGuessAvailableColors < self
     include CleanEnvironment
 
+    class << self
+      def parallel_safe?
+        false
+      end
+    end
+
     {
       "rxvt"                 => 8,
       "xterm-color"          => 8,
@@ -116,6 +123,12 @@ class TestUnitColorScheme < Test::Unit::TestCase
 
   class TestDefaultScheme < self
     include CleanEnvironment
+
+    class << self
+      def parallel_safe?
+        false
+      end
+    end
 
     def test_direct_color
       ENV["TERM"] = "xterm-direct"

@@ -325,6 +325,7 @@ module Test
         end
 
         def setup
+          omit if runner_class == Test::Unit::TestSuiteRactorRunner
           @t1 = t1 = create_test(1)
           @t2 = t2 = create_test(2)
           @t3 = t3 = create_test(3)

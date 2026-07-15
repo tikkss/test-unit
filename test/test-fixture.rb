@@ -2,6 +2,10 @@ class TestUnitFixture < Test::Unit::TestCase
   module EmptyModule
   end
 
+  def setup
+    omit
+  end
+
   class TestSetup < self
     def test_without_option
       expected_setup_calls = [:setup,

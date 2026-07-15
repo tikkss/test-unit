@@ -11,6 +11,7 @@ module Test
 
         attr_reader :patterns, :excludes, :base
         attr_reader :default_test_paths
+        attr_writer :load, :test_case_descendants, :program_file
 
         def initialize
           super
@@ -21,6 +22,9 @@ module Test
           @base = nil
           @default_test_paths = []
           @require_failed_infos = []
+          @load = true
+          @test_case_descendants = nil
+          @program_file = nil
         end
 
         def base=(base)
@@ -67,9 +71,13 @@ module Test
           end
         end
 
+        def test_case_descendants
+          @test_case_descendants ||= TestCase::DESCENDANTS
+        end
+
         def find_test_cases(already_gathered)
           test_cases = []
-          TestCase::DESCENDANTS.each do |test_case|
+          test_case_descendants.each do |test_case|
             next if already_gathered.key?(test_case)
             test_cases << test_case
             already_gathered[test_case] = true
@@ -136,11 +144,11 @@ module Test
 
           path = path.to_s
           begin
-            $LOAD_PATH.unshift(path)
+            $LOAD_PATH.unshift(path) if @load
             yield
           ensure
-            index = $LOAD_PATH.index(path)
-            $LOAD_PATH.delete_at(index) if index
+            index = $LOAD_PATH.index(path) if @load
+            $LOAD_PATH.delete_at(index) if index and @load
           end
         end
 

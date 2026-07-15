@@ -221,5 +221,7 @@ module Test
         end
       end
     end
+    Ractor.make_shareable(ColorScheme.default_for_8_colors)
+    Ractor.make_shareable(ColorScheme.default_for_256_colors)
   end
 end

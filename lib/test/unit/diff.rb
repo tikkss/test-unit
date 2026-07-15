@@ -288,6 +288,7 @@ module Test
              0xFE54..0xFE66, 0xFE68..0xFE6B, 0xFF01..0xFF60,
              0xFFE0..0xFFE6, 0x20000..0x2FFFD, 0x30000..0x3FFFD,
             ]
+          Ractor.make_shareable(WIDE_CHARACTERS)
 
           AMBIGUOUS =
             [0x00A1..0x00A1, 0x00A4..0x00A4, 0x00A7..0x00A8,
@@ -344,6 +345,7 @@ module Test
              0xE000..0xF8FF, 0xFE00..0xFE0F, 0xFFFD..0xFFFD,
              0xE0100..0xE01EF, 0xF0000..0xFFFFD, 0x100000..0x10FFFD,
             ]
+          Ractor.make_shareable(AMBIGUOUS)
 
           def wide_character?(character)
             binary_search_ranges(character, WIDE_CHARACTERS) or

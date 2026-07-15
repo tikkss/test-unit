@@ -23,6 +23,7 @@ module Test
 
       NAMES = ["black", "red", "green", "yellow",
                "blue", "magenta", "cyan", "white"]
+      Ractor.make_shareable(NAMES)
 
       attr_reader :name
       def initialize(name, options={})

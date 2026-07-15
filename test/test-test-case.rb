@@ -26,6 +26,7 @@ module Test
       end
 
       def setup
+        omit if defined?(Ractor) and not(Ractor.main?)
         @tc_failure_error = Class.new(TestCase) do
           def test_failure
             assert_block("failure") do
@@ -1006,6 +1007,7 @@ module Test
 
           class TestNoInheritance < self
             def setup
+              omit if defined?(Ractor) and not(Ractor.main?)
               @test_case = Class.new(TestCase) do
                 extend CallLogger
 
@@ -1054,6 +1056,7 @@ module Test
             end
 
             def setup
+              omit if runner_class == Test::Unit::TestSuiteRactorRunner
               @original_descendants = TestCase::DESCENDANTS.dup
               TestCase::DESCENDANTS.clear
 
@@ -1121,6 +1124,7 @@ module Test
             end
 
             def teardown
+              return if runner_class == Test::Unit::TestSuiteRactorRunner
               TestCase::DESCENDANTS.replace(@original_descendants)
             end
 

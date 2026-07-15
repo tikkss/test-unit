@@ -25,10 +25,10 @@ module Test
       # test suites that have lower priority.
       attr_accessor :priority
 
-      STARTED = name + "::STARTED"
-      STARTED_OBJECT = name + "::STARTED::OBJECT"
-      FINISHED = name + "::FINISHED"
-      FINISHED_OBJECT = name + "::FINISHED::OBJECT"
+      STARTED = (name + "::STARTED").freeze
+      STARTED_OBJECT = (name + "::STARTED::OBJECT").freeze
+      FINISHED = (name + "::FINISHED").freeze
+      FINISHED_OBJECT = (name + "::FINISHED::OBJECT").freeze
 
       # Creates a new TestSuite with the given name.
       def initialize(name="Unnamed TestSuite", test_case=nil)
@@ -127,6 +127,17 @@ module Test
 
       def passed?
         @tests.all?(&:passed?)
+      end
+
+      def freeze_recursive
+        @tests.each do |test|
+          if test.is_a?(TestSuite)
+            test.freeze_recursive
+          else
+            test.class.freeze_recursive
+          end
+        end
+        freeze
       end
     end
   end

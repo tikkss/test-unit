@@ -58,7 +58,7 @@ module Test
       end
 
       # @private
-      NOT_SPECIFIED = Object.new
+      NOT_SPECIFIED = Object.new.freeze
 
       # @overload assert(object, message=nil)
       #
@@ -131,17 +131,17 @@ module Test
           have_object = !NOT_SPECIFIED.equal?(object)
           if block
             message = object if have_object
-            if defined?(PowerAssert)
-              PowerAssert.start(block, :assertion_method => __callee__) do |pa|
-                pa_message = AssertionMessage.delayed_literal(&pa.message_proc)
-                assertion_message = build_message(message, "?", pa_message)
-                assert_block(assertion_message) do
-                  pa.yield
-                end
-              end
-            else
+            # if defined?(PowerAssert)
+            #   PowerAssert.start(block, :assertion_method => __callee__) do |pa|
+            #     pa_message = AssertionMessage.delayed_literal(&pa.message_proc)
+            #     assertion_message = build_message(message, "?", pa_message)
+            #     assert_block(assertion_message) do
+            #       pa.yield
+            #     end
+            #   end
+            # else
               assert(yield, message)
-            end
+            # end
           else
             unless have_object
               raise ArgumentError, "wrong number of arguments (0 for 1..2)"
@@ -2263,6 +2263,7 @@ EOT
             @array.each(&block)
           end
         end
+        Ractor.make_shareable(Inspector.inspector_classes)
 
         class Literal
           def initialize(value)

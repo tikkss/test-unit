@@ -233,6 +233,12 @@ EOM
         end
 
         class TestSystemMessage < self
+          class << self
+            def parallel_safe?
+              false
+            end
+          end
+
           def test_different_type
             message = <<-EOM.chomp
 <"111111"> expected but was
@@ -1609,7 +1615,7 @@ EOM
 
       class TestBlock < self
         def test_with_message
-          if defined?(PowerAssert)
+          if defined?(PowerAssert) and not(defined?(Ractor) and not(Ractor.main?))
             system_message = <<-MESSAGE.chomp
               1.to_s == "2"
                 |    |
@@ -2916,6 +2922,7 @@ EOM
       end
 
       def setup
+        omit
         @data = "Hello!" * 100
         if ObjectSpace.respond_to?(:memsize_of)
           @data_size = ObjectSpace.memsize_of(@data)

@@ -50,6 +50,14 @@ module Test
           @cached_after_callbacks[type] ||= collect_after_callbacks(type)
         end
 
+        def make_shareable
+          [:setup, :cleanup, :teardown].each do |type|
+            before_callbacks(type)
+            after_callbacks(type)
+          end
+          Ractor.make_shareable(self)
+        end
+
         private
         def target_test_cases
           @cached_target_test_cases ||= collect_target_test_cases

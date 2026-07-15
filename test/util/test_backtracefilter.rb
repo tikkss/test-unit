@@ -40,6 +40,7 @@ module Test::Unit::Util
 
     def test_power_assert_backtrace
       omit('test for power_assert') unless defined?(PowerAssert)
+      omit('test for non ractor') if defined?(Ractor) and not(Ractor.main?)
       blk = Proc.new {caller.find {|i| /power_assert.*in [`'](?:PowerAssert\.)?start'/ =~ i}}
       PowerAssert.start(blk) do |pa|
         backtrace = [pa.yield,

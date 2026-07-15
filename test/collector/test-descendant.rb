@@ -9,11 +9,13 @@ class TestUnitCollectorDescendant < Test::Unit::TestCase
   end
 
   def setup
+    omit if runner_class == Test::Unit::TestSuiteRactorRunner
     @previous_descendants = Test::Unit::TestCase::DESCENDANTS.dup
     Test::Unit::TestCase::DESCENDANTS.clear
   end
 
   def teardown
+    return if runner_class == Test::Unit::TestSuiteRactorRunner
     Test::Unit::TestCase::DESCENDANTS.replace(@previous_descendants)
   end
 
