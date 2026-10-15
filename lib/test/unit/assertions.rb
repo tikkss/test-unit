@@ -37,6 +37,12 @@ module Test
 
     module Assertions
 
+      class << self
+        def on_ractor_start
+          Ractor.make_shareable(AssertionMessage::Inspector.inspector_classes)
+        end
+      end
+
       ##
       # The assertion upon which all other assertions are based. Passes if the
       # block yields not false nor nil.
@@ -58,7 +64,7 @@ module Test
       end
 
       # @private
-      NOT_SPECIFIED = Object.new
+      NOT_SPECIFIED = Object.new.freeze
 
       # @overload assert(object, message=nil)
       #
@@ -131,7 +137,7 @@ module Test
           have_object = !NOT_SPECIFIED.equal?(object)
           if block
             message = object if have_object
-            if defined?(PowerAssert)
+            if defined?(PowerAssert) and (not(Unit.ractor_available?) or Unit.main_ractor?)
               PowerAssert.start(block, :assertion_method => __callee__) do |pa|
                 pa_message = AssertionMessage.delayed_literal(&pa.message_proc)
                 assertion_message = build_message(message, "?", pa_message)

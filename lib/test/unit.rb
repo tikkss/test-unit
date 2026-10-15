@@ -533,6 +533,14 @@ module Test # :nodoc:
         end
         @@box_available_flag
       end
+
+      def ractor_available?
+        defined?(Ractor)
+      end
+
+      def main_ractor?
+        ractor_available? and Ractor.main?
+      end
     end
   end
 end

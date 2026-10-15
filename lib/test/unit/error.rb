@@ -18,8 +18,8 @@ module Test
       attr_reader :test_name, :exception
       attr_reader :method_name
 
-      SINGLE_CHARACTER = 'E'
-      LABEL = "Error"
+      SINGLE_CHARACTER = 'E'.freeze
+      LABEL = "Error".freeze
 
       # Creates a new Error with the given test_name and
       # exception.
@@ -78,13 +78,15 @@ module Test
 
       NOT_PASS_THROUGH_EXCEPTIONS = []
       NOT_PASS_THROUGH_EXCEPTION_NAMES = ["Timeout::Error"]
+      Ractor.make_shareable(NOT_PASS_THROUGH_EXCEPTION_NAMES)
       PASS_THROUGH_EXCEPTIONS = [
         NoMemoryError,
         SignalException,
         Interrupt,
         SystemExit,
-      ]
+      ].freeze
       PASS_THROUGH_EXCEPTION_NAMES = []
+      Ractor.make_shareable(PASS_THROUGH_EXCEPTION_NAMES)
       private
       def handle_all_exception(exception)
         return false if pass_through_exception?(exception)
@@ -95,10 +97,10 @@ module Test
       end
 
       def pass_through_exception?(exception)
-        case exception
-        when *NOT_PASS_THROUGH_EXCEPTIONS
-          return false
-        end
+        # case exception
+        # when *NOT_PASS_THROUGH_EXCEPTIONS
+        #   return false
+        # end
         case exception.class.name
         when *NOT_PASS_THROUGH_EXCEPTION_NAMES
           return false

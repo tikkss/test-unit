@@ -2,6 +2,8 @@ require 'test/unit'
 require 'test/unit/collector/descendant'
 
 class TestUnitCollectorDescendant < Test::Unit::TestCase
+  include TestUnitTestUtil
+
   class << self
     def parallel_safe?
       false
@@ -9,11 +11,15 @@ class TestUnitCollectorDescendant < Test::Unit::TestCase
   end
 
   def setup
+    if non_main_ractor?
+      omit("can't change DESCENDANTS in non-main Ractor")
+    end
     @previous_descendants = Test::Unit::TestCase::DESCENDANTS.dup
     Test::Unit::TestCase::DESCENDANTS.clear
   end
 
   def teardown
+    return if non_main_ractor?
     Test::Unit::TestCase::DESCENDANTS.replace(@previous_descendants)
   end
 

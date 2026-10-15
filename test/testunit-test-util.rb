@@ -4,6 +4,10 @@ require "bigdecimal"
 
 module TestUnitTestUtil
   private
+  def non_main_ractor?
+    defined?(Ractor) and not (Ractor.main?)
+  end
+
   def jruby?
     RUBY_PLATFORM == "java"
   end

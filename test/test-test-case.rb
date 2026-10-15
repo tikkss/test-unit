@@ -5,10 +5,13 @@
 # License:: Ruby license.
 
 require 'test/unit'
+require_relative 'testunit-test-util'
 
 module Test
   module Unit
     class TestTestCase < TestCase
+      include TestUnitTestUtil
+
       self.test_order = :random
       def test_creation
         test_case = Class.new(TestCase) do
@@ -26,6 +29,9 @@ module Test
       end
 
       def setup
+        if non_main_ractor?
+          omit("can't define test in non-main ractor")
+        end
         @tc_failure_error = Class.new(TestCase) do
           def test_failure
             assert_block("failure") do
@@ -1006,6 +1012,7 @@ module Test
 
           class TestNoInheritance < self
             def setup
+              omit("can't define test in non-main Ractor") if non_main_ractor?
               @test_case = Class.new(TestCase) do
                 extend CallLogger
 
@@ -1054,6 +1061,9 @@ module Test
             end
 
             def setup
+              if non_main_ractor?
+                omit("can't change DESCENDANTS in non-main Ractor")
+              end
               @original_descendants = TestCase::DESCENDANTS.dup
               TestCase::DESCENDANTS.clear
 
@@ -1121,6 +1131,7 @@ module Test
             end
 
             def teardown
+              return if runner_class == Test::Unit::TestSuiteRactorRunner
               TestCase::DESCENDANTS.replace(@original_descendants)
             end
 

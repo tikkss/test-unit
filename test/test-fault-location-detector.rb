@@ -16,6 +16,16 @@ class TestFaultLocationDetector < Test::Unit::TestCase
   private
   def run_test_case(test_case)
     suite = test_case.suite
+    run_test_suite(suite)
+  end
+
+  def run_test_object(test)
+    suite = Test::Unit::TestSuite.new(test.class.name, test.class)
+    suite << test
+    run_test_suite(suite)
+  end
+
+  def run_test_suite(suite)
     result = Test::Unit::TestResult.new
     worker_context = Test::Unit::WorkerContext.new(nil, nil, result)
     suite.run(worker_context) {}
@@ -50,6 +60,12 @@ class TestFaultLocationDetector < Test::Unit::TestCase
   end
 
   class TestSourceLocation < self
+    class << self
+      def parallel_safe?
+        false
+      end
+    end
+
     setup
     def setup_check_source_location(&_)
       unless lambda {}.respond_to?(:source_location)
@@ -72,6 +88,12 @@ class TestFaultLocationDetector < Test::Unit::TestCase
     end
 
     class TestOneLine < self
+      class << self
+        def parallel_safe?
+          false
+        end
+      end
+
       def test_brace
         target_line_number = nil
         test_case = Class.new(Test::Unit::TestCase) do
@@ -113,11 +135,19 @@ class TestFaultLocationDetector < Test::Unit::TestCase
 
         class << self
           def target_line_number
-            @target_line_number
+            if defined?(Ractor) and not(Ractor.main?)
+              Ractor["#{name}_target_line_number"]
+            else
+              @target_line_number
+            end
           end
 
           def target_line_number=(line_number)
-            @target_line_number = line_number
+            if defined?(Ractor) and not(Ractor.main?)
+              Ractor["#{name}_target_line_number"] = line_number
+            else
+              @target_line_number = line_number
+            end
           end
         end
 
@@ -135,24 +165,33 @@ class TestFaultLocationDetector < Test::Unit::TestCase
 
       class << self
         def target_line_number
-          @target_line_number
+          if defined?(Ractor) and not(Ractor.main?)
+            Ractor["#{name}_target_line_number"]
+          else
+            @target_line_number
+          end
         end
 
         def target_line_number=(line_number)
-          @target_line_number = line_number
+          if defined?(Ractor) and not(Ractor.main?)
+            Ractor["#{name}_target_line_number"] = line_number
+          else
+            @target_line_number = line_number
+          end
         end
+      end
+
+      def valid?
+        false
+      end
+
+      def test_failed
+        self.class.target_line_number = __LINE__; assert_always_failed
       end
     end
 
     def test_in_named_test_case
-      # Define test method dynamically to avoid running this failed
-      # test in the main test suite.
-      NamedTestCase.class_eval do
-        def test_failed
-          self.class.target_line_number = __LINE__; assert_always_failed
-        end
-      end
-      fault = run_test_case(NamedTestCase)
+      fault = run_test_object(NamedTestCase.new("test_failed"))
       assert_detect(fault, NamedTestCase.target_line_number)
     end
 

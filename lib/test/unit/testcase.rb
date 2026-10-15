@@ -117,13 +117,13 @@ module Test
       include Util::BacktraceFilter
       include Util::Output
 
-      STARTED = name + "::STARTED" # :nodoc:
-      FINISHED = name + "::FINISHED" # :nodoc:
-      STARTED_OBJECT = name + "::STARTED::OBJECT" # :nodoc:
-      FINISHED_OBJECT = name + "::FINISHED::OBJECT" # :nodoc:
+      STARTED = (name + "::STARTED").freeze # :nodoc:
+      FINISHED = (name + "::FINISHED").freeze # :nodoc:
+      STARTED_OBJECT = (name + "::STARTED::OBJECT").freeze # :nodoc:
+      FINISHED_OBJECT = (name + "::FINISHED::OBJECT").freeze # :nodoc:
 
       DESCENDANTS = [] # :nodoc:
-      AVAILABLE_ORDERS = [:alphabetic, :random, :defined] # :nodoc:
+      AVAILABLE_ORDERS = [:alphabetic, :random, :defined].freeze # :nodoc:
 
       class << self
         # Indicates whether the test is parallel safe.
@@ -159,8 +159,15 @@ module Test
           true
         end
 
+        def on_ractor_start
+          Ractor.make_shareable(@attributes_table)
+          Ractor.make_shareable(@@test_orders)
+          fixture.on_ractor_start
+          # freeze
+        end
+
         def inherited(sub_class) # :nodoc:
-          DESCENDANTS << sub_class
+          DESCENDANTS << sub_class if Ractor.main?
           super
         end
 
@@ -177,6 +184,7 @@ module Test
         @@added_method_names = {}
         def method_added(name) # :nodoc:
           super
+          return unless Ractor.main?
           added_method_names = (@@added_method_names[self] ||= {})
           stringified_name = name.to_s
           if added_method_names.key?(stringified_name)
@@ -298,10 +306,6 @@ module Test
         # Returns the current test order. This returns
         # `:alphabetic` by default.
         def test_order
-          ancestors.each do |ancestor|
-            order = @@test_orders[ancestor]
-            return order if order
-          end
           AVAILABLE_ORDERS.first
         end
 
@@ -318,7 +322,7 @@ module Test
         # :defined
         # : Tests are sorted in defined order.
         def test_order=(order)
-          @@test_orders[self] = order
+          define_singleton_method(:test_order, Ractor.shareable_lambda {order})
         end
 
         # Defines a test in declarative syntax or marks
@@ -359,6 +363,10 @@ module Test
             attribute(:test, true, {}, method_name)
             if block.respond_to?(:source_location)
               attribute(:source_location, block.source_location, {}, method_name)
+            end
+            begin
+              block = Ractor.shareable_lambda(&block)
+            rescue Ractor::IsolationError
             end
             define_method(method_name, &block)
           else
@@ -521,11 +529,19 @@ module Test
         #
         # @since 3.7.4
         def worker_id
-          @worker_id || 0
+          if Ractor.main?
+            @worker_id || 0
+          else
+            Ractor[:test_unit_worker_id] || 0
+          end
         end
 
         def worker_id=(worker_id) # :nodoc:
-          @worker_id = worker_id
+          if Ractor.main?
+            @worker_id = worker_id
+          else
+            Ractor[:test_unit_worker_id] = worker_id
+          end
         end
 
         private
@@ -575,9 +591,11 @@ module Test
           parent_test_case = self
           sub_test_case = Class.new(self) do
             singleton_class = class << self; self; end
-            singleton_class.__send__(:define_method, :name) do
-              [parent_test_case.name, name].compact.join("::")
+            full_name = [parent_test_case.name, name].compact.join("::").freeze
+            name_method = Ractor.shareable_lambda do
+              full_name
             end
+            singleton_class.__send__(:define_method, :name, &name_method)
           end
           # Give the anonymous class a unique, Base64 encoded constant
           # name. So it becomes a named class that `Marshal` can
@@ -670,13 +688,13 @@ module Test
           @internal_data.test_finished
           result.add_run
           yield(FINISHED, name)
-          yield(FINISHED_OBJECT, self)
         ensure
           # @_result = nil # For test-spec's after_all :<
           (instance_variables - instance_variables_before).each do |name|
             remove_instance_variable(name)
           end
         end
+        yield(FINISHED_OBJECT, self)
       end
 
       # Called before every test method runs. Can be used
@@ -1063,5 +1081,6 @@ module Test
         end
       end
     end
+    Ractor.make_shareable(ExceptionHandler.exception_handlers)
   end
 end

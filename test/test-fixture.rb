@@ -1,5 +1,13 @@
 class TestUnitFixture < Test::Unit::TestCase
+  include TestUnitTestUtil
+
   module EmptyModule
+  end
+
+  def setup
+    if non_main_ractor?
+      omit("can't define test in non-main ractor")
+    end
   end
 
   class TestSetup < self
