@@ -2,6 +2,12 @@ class TestUnitFixture < Test::Unit::TestCase
   module EmptyModule
   end
 
+  def setup
+    if Test::Unit.non_main_ractor?
+      omit("can't define test in non-main ractor")
+    end
+  end
+
   class TestSetup < self
     def test_without_option
       expected_setup_calls = [:setup,

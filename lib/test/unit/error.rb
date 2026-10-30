@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #--
 #
 # Author:: Nathaniel Talbott.
@@ -76,15 +77,15 @@ module Test
         end
       end
 
-      NOT_PASS_THROUGH_EXCEPTIONS = []
-      NOT_PASS_THROUGH_EXCEPTION_NAMES = ["Timeout::Error"]
+      NOT_PASS_THROUGH_EXCEPTIONS = [].freeze
+      NOT_PASS_THROUGH_EXCEPTION_NAMES = ["Timeout::Error"].freeze
       PASS_THROUGH_EXCEPTIONS = [
         NoMemoryError,
         SignalException,
         Interrupt,
         SystemExit,
-      ]
-      PASS_THROUGH_EXCEPTION_NAMES = []
+      ].freeze
+      PASS_THROUGH_EXCEPTION_NAMES = [].freeze
       private
       def handle_all_exception(exception)
         return false if pass_through_exception?(exception)

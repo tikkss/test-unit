@@ -180,28 +180,38 @@ module Test
         end
 
         def find_attribute(method_name, name, options={})
+          return nil if self == TestCase
+
           recursive_p = options[:recursive]
           recursive_p = true if recursive_p.nil?
 
-          @attributes_table ||= StringifyKeyHash.new
-          if @attributes_table.key?(method_name)
-            attributes = @attributes_table[method_name]
-            if attributes.key?(name)
-              return attributes[name]
+          if defined?(@attributes_table)
+            @attributes_table ||= StringifyKeyHash.new
+            if @attributes_table.key?(method_name)
+              attributes = @attributes_table[method_name]
+              if attributes.key?(name)
+                return attributes[name]
+              end
             end
           end
 
           return nil unless recursive_p
-          return nil if self == TestCase
 
-          @cached_parent_test_case ||= ancestors.find do |ancestor|
-            ancestor != self and
-              ancestor.is_a?(Class) and
-              ancestor < Test::Unit::Attribute
+          find_parent_test_case = lambda do
+            ancestors.find do |ancestor|
+              ancestor != self and
+                ancestor.is_a?(Class) and
+                ancestor < Test::Unit::Attribute
+            end
           end
-          return nil if @cached_parent_test_case.nil?
+          if defined?(Ractor) and not(Ractor.main?)
+            parent_test_case = find_parent_test_case.call
+          else
+            parent_test_case = @cached_parent_test_case ||= find_parent_test_case.call
+          end
+          return nil if parent_test_case.nil?
 
-          @cached_parent_test_case.find_attribute(method_name, name, options)
+          parent_test_case.find_attribute(method_name, name, options)
         end
 
         @@attribute_observers = StringifyKeyHash.new

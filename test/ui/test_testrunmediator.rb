@@ -2,6 +2,7 @@ require 'test/unit/ui/testrunnermediator'
 
 class TestUnitUIMediator < Test::Unit::TestCase
   def test_run_suite_with_interrupt_exception
+    omit if defined?(Ractor) and not(Ractor.main?)
     test_case = Class.new(Test::Unit::TestCase) do
       def test_raise_interrupt
         raise Interrupt, "from test"

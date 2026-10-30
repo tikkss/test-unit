@@ -533,6 +533,38 @@ module Test # :nodoc:
         end
         @@box_available_flag
       end
+
+      def ractor_available?
+        defined?(Ractor)
+      end
+
+      def main_ractor?
+        ractor_available? and Ractor.main?
+      end
+
+      def non_main_ractor?
+        ractor_available? and not (Ractor.main?)
+      end
+
+      def shareable_lambda(&block)
+        if ractor_available?
+          Ractor.shareable_lambda(&block)
+        else
+          block
+        end
+      end
+
+      def shareable_lambda_if_possible(&block)
+        if ractor_available?
+          begin
+            Ractor.shareable_lambda(&block)
+          rescue Ractor::IsolationError
+            block
+          end
+        else
+          block
+        end
+      end
     end
   end
 end

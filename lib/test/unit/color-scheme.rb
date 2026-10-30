@@ -30,9 +30,7 @@ module Test
           end
         end
 
-        @@default_for_8_colors = nil
         def default_for_8_colors
-          @@default_for_8_colors ||=
             new("pass" => Color.new("green", :background => true) +
                           Color.new("white", :bold => true),
                 "pass-marker" => Color.new("green", :bold => true),
@@ -67,9 +65,7 @@ module Test
                                    Color.new("white", :bold => true))
         end
 
-        @@default_for_256_colors = nil
         def default_for_256_colors
-          @@default_for_256_colors ||=
             new("pass" => Color.new("030", :background => true) +
                           Color.new("555", :bold => true),
                 "pass-marker" => Color.new("050", :bold => true),
@@ -201,6 +197,14 @@ module Test
         end
         hash
       end
+
+      def ==(other)
+        self.class === other and
+          @schema == other.schema
+      end
+
+      protected
+      attr_reader :schema
 
       private
       def make_color(color_spec)

@@ -12,6 +12,9 @@ class TestUnitCollectorLoad < Test::Unit::TestCase
   end
 
   def setup
+    if Test::Unit.non_main_ractor?
+      omit("can't change DESCENDANTS in non-main Ractor")
+    end
     @previous_descendants = Test::Unit::TestCase::DESCENDANTS.dup
     Test::Unit::TestCase::DESCENDANTS.clear
 
@@ -394,6 +397,7 @@ EOT
   end
 
   def teardown
+    return if defined?(Ractor) and not(Ractor.main?)
     @test_dir.rmtree if @test_dir.exist?
     @box_test_dir.rmtree if @box_test_dir.exist?
     @box_same_test_dir.rmtree if @box_same_test_dir.exist?

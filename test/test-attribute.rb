@@ -1,4 +1,10 @@
 class TestUnitAttribute < Test::Unit::TestCase
+  def setup
+    if Test::Unit.non_main_ractor?
+      omit("can't define test in non-main ractor")
+    end
+  end
+
   class TestStack < Test::Unit::TestCase
     class << self
       def suite
