@@ -22,6 +22,13 @@ module Test
             ::PowerAssert.method(:start).source_location[0].split(TESTUNIT_FILE_SEPARATORS)[0..-2] :
             nil
 
+        class << self
+          def on_ractor_start
+            Ractor.make_shareable(TESTUNIT_PREFIX)
+            Ractor.make_shareable(POWERASSERT_PREFIX)
+          end
+        end
+
         module_function
         def filter_backtrace(backtrace, prefix=nil)
           return ["No backtrace"] unless backtrace

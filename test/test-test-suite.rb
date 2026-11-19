@@ -66,6 +66,9 @@ module Test
       end
 
       def test_run
+        if Unit.non_main_ractor?
+          omit("@testcase1 must be defined as static or isolated using a Box")
+        end
         progress = []
         @testcase1.test_order = :alphabetic
         suite = @testcase1.suite

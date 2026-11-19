@@ -26,6 +26,9 @@ module Test
       end
 
       def setup
+        if Unit.non_main_ractor?
+          omit("can't define test in non-main ractor")
+        end
         @tc_failure_error = Class.new(TestCase) do
           def test_failure
             assert_block("failure") do
@@ -1054,6 +1057,9 @@ module Test
 
           class TestNoInheritance < self
             def setup
+              if Unit.non_main_ractor?
+                omit("can't define test in non-main Ractor")
+              end
               @test_case = Class.new(TestCase) do
                 extend CallLogger
 
@@ -1102,6 +1108,9 @@ module Test
             end
 
             def setup
+              if Unit.non_main_ractor?
+                omit("can't change DESCENDANTS in non-main Ractor")
+              end
               @original_descendants = TestCase::DESCENDANTS.dup
               TestCase::DESCENDANTS.clear
 
@@ -1169,6 +1178,7 @@ module Test
             end
 
             def teardown
+              return if runner_class == Test::Unit::TestSuiteRactorRunner
               TestCase::DESCENDANTS.replace(@original_descendants)
             end
 

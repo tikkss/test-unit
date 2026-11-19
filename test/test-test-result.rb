@@ -17,6 +17,10 @@ module Test
         @my_result.add_error(@error)
       end
 
+      def teardown
+        @my_result = nil
+      end
+
       def test_result_changed_notification
         called1 = false
         @my_result.add_listener(TestResult::CHANGED) do |result|

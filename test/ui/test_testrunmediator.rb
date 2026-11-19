@@ -2,6 +2,9 @@ require 'test/unit/ui/testrunnermediator'
 
 class TestUnitUIMediator < Test::Unit::TestCase
   def test_run_suite_with_interrupt_exception
+    if Test::Unit.non_main_ractor?
+      omit("can't change @@need_auto_run in non-main Ractor")
+    end
     test_case = Class.new(Test::Unit::TestCase) do
       def test_raise_interrupt
         raise Interrupt, "from test"

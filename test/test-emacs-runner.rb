@@ -1,3 +1,4 @@
+require "stringio"
 require 'test/unit'
 require 'test/unit/ui/emacs/testrunner'
 
@@ -55,6 +56,6 @@ EOM
   private
   def create_runner(suite=nil)
     suite ||= Test::Unit::TestSuite.new
-    Test::Unit::UI::Emacs::TestRunner.new(suite)
+    Test::Unit::UI::Emacs::TestRunner.new(suite, {output: StringIO.new("")})
   end
 end
